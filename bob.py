@@ -1,12 +1,14 @@
-import json, hashlib, socket
+import hashlib
+import json 
+import socket
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 # Load keys
-with open("bob_private.pem", "rb") as f:
+with open("key/bob/bob_private.pem", "rb") as f:
     bob_private = serialization.load_pem_private_key(f.read(), password=None)
-with open("alice_public.pem", "rb") as f:
+with open("key/alice/alice_public.pem", "rb") as f:
     alice_public = serialization.load_pem_public_key(f.read())
 
 # Terima payload via socket 
