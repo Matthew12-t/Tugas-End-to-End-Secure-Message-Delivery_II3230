@@ -110,7 +110,7 @@ Payload dikirim dalam format JSON melalui TCP socket. Berikut struktur lengkapny
 | Asymmetric Encryption | RSA-2048 + OAEP | Mengenkripsi AES key agar hanya Bob yang bisa membukanya menggunakan private key miliknya. |
 | Hash Function | SHA-256 | Dihitung dari plaintext. Bob hitung ulang dan bandingkan untuk memastikan pesan tidak berubah selama transmisi. |
 | Digital Signature | RSA-PSS + SHA-256 | Alice menandatangani hash menggunakan private key-nya. Bob verifikasi menggunakan public key Alice untuk memastikan keaslian pengirim. |
-| Transport | TCP Socket | Payload JSON dikirim dari IP Alice ke IP Bob. Ukuran payload dikirim terlebih dahulu (4 bytes header) sebelum data utama. |
+| Transport | TCP Socket | Payload JSON dikirim dari IP Alice ke IP Bob. Sisi penerima (Bob) akan membaca aliran data secara terus-menerus hingga seluruh payload diterima dan koneksi ditutup oleh pengirim. |
 
 ## Alasan Pemilihan Algoritma
 

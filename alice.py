@@ -12,25 +12,29 @@ with open("key/alice/alice_private.pem", "rb") as f:
 with open("key/bob/bob_public.pem", "rb") as f:
     bob_public = serialization.load_pem_public_key(f.read())
 
-# Plaintext
-plaintext = "Bob, transfer dana penelitian sebesar 10 juta."
+print("\n=== SISI PENGIRIM (ALICE) ===")
+print("Masukkan pesan yang akan dikirim ke Bob:")
+plaintext = input("> ")
+
+if len(plaintext.strip()) < 15:
+    print("    [!] Catatan: Panjang teks tergolong singkat.")
+
 plaintext_bytes = plaintext.encode()
-print(f"1. Plaintext: {plaintext}")
 
-# Buat AES Key
-aes_key = os.urandom(32)  # 256-bit
-iv = os.urandom(16)       # Initialization Vector
-print(f"2. AES Key (hex): {aes_key.hex()}")
+print("\n[*] 1. Mempersiapkan Data & Kunci")
+print(f"    Plaintext          : '{plaintext}'")
+aes_key = os.urandom(32)
+iv = os.urandom(16)
+print(f"    AES Key (hex)      : {aes_key.hex()[:32]}...")
 
-# Enkripsi pesan dengan AES
+print("\n[*] 2. Melakukan Enkripsi")
 cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv))
 encryptor = cipher.encryptor()
 pad_len = 16 - (len(plaintext_bytes) % 16)
 padded = plaintext_bytes + bytes([pad_len] * pad_len)
 ciphertext = encryptor.update(padded) + encryptor.finalize()
-print(f"3. Ciphertext (hex): {ciphertext.hex()}")
+print(f"    Ciphertext (hex)   : {ciphertext.hex()[:32]}...")
 
-# Enkripsi AES key dengan public key Bob
 encrypted_key = bob_public.encrypt(
     aes_key,
     padding.OAEP(
@@ -39,13 +43,12 @@ encrypted_key = bob_public.encrypt(
         label=None
     )
 )
-print(f"4. Encrypted AES Key (hex): {encrypted_key.hex()}")
+print(f"    Encrypted Key (hex): {encrypted_key.hex()[:32]}...")
 
-# Hash plaintext
+print("\n[*] 3. Membuat Hash & Digital Signature")
 hash_val = hashlib.sha256(plaintext_bytes).hexdigest()
-print(f"5. SHA-256 Hash: {hash_val}")
+print(f"    SHA-256 Hash       : {hash_val[:32]}...")
 
-# Digital Signature
 signature = alice_private.sign(
     hash_val.encode(),
     padding.PSS(
@@ -54,9 +57,9 @@ signature = alice_private.sign(
     ),
     hashes.SHA256()
 )
-print(f"6. Signature (hex): {signature.hex()}")
+print(f"    Signature (hex)    : {signature.hex()[:32]}...")
 
-# Kirim payload via socket
+# Mengirim payload
 payload = {
     "source_ip": "127.0.0.1",
     "destination_ip": "127.0.0.1",
@@ -70,9 +73,10 @@ payload = {
     "asymmetric_algorithm": "RSA-2048"
 }
 
+print("\n[*] 4. Mengirim Payload ke Jaringan")
 payload_json = json.dumps(payload).encode()
 s = socket.socket()
 s.connect(("127.0.0.1", 9999))
 s.sendall(payload_json)
 s.close()
-print("\n7. Payload berhasil dikirim ke Bob!")
+print("    [+] Payload berhasil dikirim ke Bob!\n")
