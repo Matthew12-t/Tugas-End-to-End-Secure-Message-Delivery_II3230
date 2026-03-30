@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import socket
+import textwrap
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -25,7 +26,7 @@ print("\n[*] 1. Mempersiapkan Data & Kunci")
 print(f"    Plaintext          : '{plaintext}'")
 aes_key = os.urandom(32)
 iv = os.urandom(16)
-print(f"    AES Key (hex)      : {aes_key.hex()[:32]}...")
+print("    AES Key (hex)      :\n" + textwrap.fill(aes_key.hex(), width=70, initial_indent="        ", subsequent_indent="        "))
 
 print("\n[*] 2. Melakukan Enkripsi")
 cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv))
@@ -33,7 +34,7 @@ encryptor = cipher.encryptor()
 pad_len = 16 - (len(plaintext_bytes) % 16)
 padded = plaintext_bytes + bytes([pad_len] * pad_len)
 ciphertext = encryptor.update(padded) + encryptor.finalize()
-print(f"    Ciphertext (hex)   : {ciphertext.hex()[:32]}...")
+print("    Ciphertext (hex)   :\n" + textwrap.fill(ciphertext.hex(), width=70, initial_indent="        ", subsequent_indent="        "))
 
 encrypted_key = bob_public.encrypt(
     aes_key,
@@ -43,11 +44,11 @@ encrypted_key = bob_public.encrypt(
         label=None
     )
 )
-print(f"    Encrypted Key (hex): {encrypted_key.hex()[:32]}...")
+print("    Encrypted Key (hex):\n" + textwrap.fill(encrypted_key.hex(), width=70, initial_indent="        ", subsequent_indent="        "))
 
 print("\n[*] 3. Membuat Hash & Digital Signature")
 hash_val = hashlib.sha256(plaintext_bytes).hexdigest()
-print(f"    SHA-256 Hash       : {hash_val[:32]}...")
+print("    SHA-256 Hash       :\n" + textwrap.fill(hash_val, width=70, initial_indent="        ", subsequent_indent="        "))
 
 signature = alice_private.sign(
     hash_val.encode(),
@@ -57,7 +58,7 @@ signature = alice_private.sign(
     ),
     hashes.SHA256()
 )
-print(f"    Signature (hex)    : {signature.hex()[:32]}...")
+print("    Signature (hex)    :\n" + textwrap.fill(signature.hex(), width=70, initial_indent="        ", subsequent_indent="        "))
 
 # Mengirim payload
 payload = {

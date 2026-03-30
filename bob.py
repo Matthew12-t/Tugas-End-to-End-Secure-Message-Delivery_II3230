@@ -1,6 +1,7 @@
 import hashlib
 import json 
 import socket
+import textwrap
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -42,7 +43,7 @@ try:
             label=None
         )
     )
-    print(f"    [OK] AES Key berhasil didekripsi : {aes_key.hex()[:32]}...")
+    print("    [OK] AES Key berhasil didekripsi :\n" + textwrap.fill(aes_key.hex(), width=70, initial_indent="        ", subsequent_indent="        "))
     dekripsi_kunci_berhasil = True
 except Exception as e:
     print(f"    [GAGAL] AES Key tidak dapat didekripsi. Detail: {e}")
